@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f0f4f2">
+  <title>Daymark | AZ-900 Study Planner</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #18302f;
+      --muted: #677775;
+      --paper: #ffffff;
+      --canvas: #f0f4f2;
+      --line: #dce5e1;
+      --teal: #087e78;
+      --teal-dark: #06645f;
+      --mint: #e6f3ef;
+      --coral: #bf4d58;
+      --coral-pale: #faeeee;
+      --gold: #dfaa43;
+      --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      --sans: "Aptos", "Trebuchet MS", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background-color: var(--canvas); background-image: repeating-linear-gradient(0deg, transparent 0 47px, rgba(8, 80, 74, .025) 48px); color: var(--ink); font: 15px/1.5 var(--sans); }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .topbar { position: sticky; top: 0; z-index: 5; height: 72px; padding: 0 max(28px, calc((100vw - 1180px) / 2)); display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, .96); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px); }
+    .brand { display: flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; font-weight: 800; letter-spacing: .2px; }
+    .brand-mark { display: grid; width: 36px; height: 36px; place-items: center; background: var(--teal); color: white; border-radius: 10px 10px 10px 3px; box-shadow: inset -4px -4px 0 rgba(0, 0, 0, .12); font: 700 21px var(--serif); }
+    .top-note { color: var(--muted); font-size: 13px; }
+    main { width: min(1180px, calc(100% - 48px)); margin: 42px auto 64px; }
+    .eyebrow { margin: 0 0 8px; color: var(--teal); font-size: 12px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; }
+    .heading-row { position: relative; display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 28px; padding: 12px 0 12px 20px; border-left: 3px solid var(--coral); }
+    .heading-row::after { position: absolute; top: 5px; right: 0; z-index: -1; width: 170px; height: 100%; background: repeating-linear-gradient(135deg, transparent 0 12px, rgba(8, 126, 120, .07) 12px 14px); clip-path: polygon(42% 0, 100% 0, 100% 100%, 0 100%); content: ""; }
+    h1 { margin: 0; font: 500 clamp(32px, 4vw, 46px)/1.08 var(--serif); letter-spacing: 0; }
+    .intro { max-width: 480px; margin: 12px 0 0; color: var(--muted); }
+    .exam-chip { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid var(--line); background: var(--paper); border-radius: 4px; white-space: nowrap; color: var(--muted); font-size: 13px; }
+    .exam-chip strong { color: var(--ink); font-size: 14px; }
+    .layout { display: grid; grid-template-columns: 350px minmax(0, 1fr); gap: 22px; align-items: start; }
+    .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 5px; }
+    .builder { padding: 24px; }
+    .panel-title { margin: 0 0 19px; font: 500 22px/1.2 var(--serif); }
+    .field-label { display: block; margin: 18px 0 7px; color: var(--ink); font-size: 13px; font-weight: 750; }
+    input[type="date"] { width: 100%; height: 43px; padding: 0 11px; color: var(--ink); border: 1px solid #cdd9d4; border-radius: 3px; background: white; transition: border-color .16s, box-shadow .16s; }
+    input[type="date"]:focus-visible, .select-field:focus-visible, .confidence:focus-visible { outline: 2px solid rgba(8, 126, 120, .22); outline-offset: 1px; border-color: var(--teal); }
+    .range-head { display: flex; align-items: baseline; justify-content: space-between; }
+    .range-value { color: var(--teal); font-size: 13px; font-weight: 800; }
+    input[type="range"] { width: 100%; accent-color: var(--teal); cursor: pointer; }
+    .range-hints { display: flex; justify-content: space-between; margin-top: -2px; color: var(--muted); font-size: 11px; }
+    .select-field { width: 100%; height: 40px; padding: 0 10px; color: var(--ink); border: 1px solid #cdd9d4; border-radius: 3px; background: white; font-size: 12px; }
+    .domains { display: grid; gap: 8px; margin-top: 10px; }
+    .domain { display: grid; grid-template-columns: 18px minmax(0, 1fr) 106px; align-items: center; gap: 8px; padding: 9px; border: 1px solid var(--line); border-radius: 3px; transition: border-color .16s, background .16s; }
+    .domain:has(input:checked) { border-color: #91c7bf; background: #f2faf7; }
+    .domain input { margin: 3px 0 0; accent-color: var(--teal); }
+    .domain label { cursor: pointer; }
+    .domain strong { display: block; font-size: 12px; }
+    .domain small { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .confidence { width: 100%; min-width: 0; height: 34px; padding: 0 5px; border: 1px solid var(--line); border-radius: 3px; background: white; color: var(--muted); font-size: 10px; cursor: pointer; }
+    .form-message { min-height: 17px; margin: 7px 0 -10px; color: var(--coral); font-size: 11px; }
+    .primary { width: 100%; min-height: 46px; margin-top: 21px; border: 0; border-radius: 3px; background: var(--teal); color: white; font-size: 13px; font-weight: 800; transition: background .15s, transform .15s; }
+    .primary:hover { background: var(--teal-dark); transform: translateY(-1px); }
+    .builder-foot { margin: 12px 0 0; color: var(--muted); font-size: 11px; text-align: center; }
+    .schedule { overflow: hidden; }
+    .schedule-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 23px 25px 18px; border-bottom: 1px solid var(--line); }
+    .schedule-head h2 { margin: 0; font: 500 24px/1.2 var(--serif); }
+    .schedule-head p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .schedule-actions { display: flex; align-items: center; gap: 10px; }
+    .export-button { padding: 8px 10px; border: 1px solid var(--line); border-radius: 3px; background: white; color: var(--teal); font-size: 11px; font-weight: 800; }
+    .export-button:hover:not(:disabled) { border-color: var(--teal); }
+    .export-button:disabled { cursor: not-allowed; opacity: .45; }
+    .countdown { min-width: 76px; padding: 8px 10px; text-align: center; border-left: 2px solid var(--coral); background: var(--coral-pale); color: var(--coral); }
+    .countdown strong { display: block; font: 500 23px/1 var(--serif); }
+    .countdown span { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .6px; }
+    .progress-wrap { padding: 17px 25px 18px; background: #fbfcfb; border-bottom: 1px solid var(--line); }
+    .progress-copy { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: 12px; }
+    .progress-copy span:last-child { color: var(--muted); }
+    .progress-track { height: 7px; overflow: hidden; border-radius: 10px; background: #e5ece9; }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: var(--teal); transition: width .35s ease; }
+    .insights { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+    .insight { min-width: 0; padding: 15px 18px; border-right: 1px solid var(--line); }
+    .insight:last-child { border-right: 0; }
+    .insight span, .insight small { display: block; color: var(--muted); font-size: 10px; }
+    .insight strong { display: block; margin: 4px 0 2px; color: var(--ink); font: 500 20px/1.1 var(--serif); overflow-wrap: anywhere; }
+    .session-list { padding: 5px 25px 15px; }
+    .day { display: grid; grid-template-columns: 66px 1fr; gap: 13px; padding: 17px 0; border-bottom: 1px solid #edf1ef; }
+    .day:last-child { border-bottom: 0; }
+    .date-tag { padding-top: 2px; color: var(--muted); font-size: 11px; line-height: 1.25; text-transform: uppercase; }
+    .date-tag strong { display: block; margin-bottom: 3px; color: var(--ink); font-size: 12px; }
+    .session { display: flex; align-items: flex-start; gap: 11px; }
+    .session-check { width: 17px; height: 17px; flex: 0 0 17px; margin: 2px 0 0; accent-color: var(--teal); cursor: pointer; }
+    .session-copy { min-width: 0; flex: 1; }
+    .session-copy strong { display: block; font-size: 13px; line-height: 1.35; }
+    .session-copy p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .session-topic { display: inline-block; margin-top: 6px; padding: 2px 6px; background: var(--mint); color: var(--teal-dark); font-size: 10px; font-weight: 750; }
+    .session-time { flex: 0 0 auto; color: var(--teal); font-size: 11px; font-weight: 750; }
+    .day.is-done .session-copy strong { color: #87938f; text-decoration: line-through; }
+    .empty-state { padding: 48px 24px; color: var(--muted); text-align: center; }
+    .empty-icon { display: grid; width: 44px; height: 44px; margin: 0 auto 13px; place-items: center; border-radius: 50%; background: var(--mint); color: var(--teal); font-size: 21px; }
+    .empty-state strong { display: block; margin-bottom: 4px; color: var(--ink); }
+    .tip { display: flex; gap: 12px; margin-top: 18px; padding: 15px 17px; border-left: 3px solid var(--gold); background: #fff8e9; color: #66562f; font-size: 12px; }
+    .tip strong { display: block; margin-bottom: 2px; color: var(--ink); }
+    .footer { margin-top: 24px; color: var(--muted); font-size: 11px; text-align: center; }
+    @media (max-width: 980px) {
+      main { width: min(640px, calc(100% - 32px)); margin-top: 28px; }
+      .heading-row { align-items: flex-start; flex-direction: column; gap: 15px; }
+      .layout { grid-template-columns: 1fr; }
+      .builder { order: 0; }
+      .schedule { order: 1; }
+    }
+    @media (max-width: 480px) {
+      .topbar { height: 60px; padding: 0 16px; }
+      .top-note { font-size: 11px; }
+      main { width: calc(100% - 24px); margin: 25px auto 40px; }
+      .builder { padding: 19px; }
+      .schedule-head { padding: 19px; }
+      .schedule-actions { gap: 6px; }
+      .export-button { padding: 7px; font-size: 10px; }
+      .progress-wrap { padding: 15px 19px; }
+      .insight { padding: 13px 10px; }
+      .insight strong { font-size: 17px; }
+      .session-list { padding-right: 19px; padding-left: 19px; }
+      .day { grid-template-columns: 56px 1fr; gap: 9px; }
+      .session-time { font-size: 10px; }
+      .exam-chip { white-space: normal; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Daymark home"><span class="brand-mark">D</span><span>daymark</span></a>
+    <span class="top-note">A steadier way to exam day</span>
+  </header>
+  <main>
+    <div class="heading-row">
+      <div>
+        <p class="eyebrow">AZ-900 · Personal study planner</p>
+        <h1>Make your next<br>study session count.</h1>
+        <p class="intro">Build a revision rhythm around your exam date and the topics that need a little more attention.</p>
+      </div>
+      <div class="exam-chip" id="examSummary" aria-live="polite">🗓️ <span>Exam date</span> <strong>Choose a date</strong></div>
+    </div>
+    <div class="layout">
+      <section class="panel builder" aria-labelledby="builderTitle">
+        <h2 class="panel-title" id="builderTitle">Set your study pace</h2>
+        <label class="field-label" for="examDate">Your exam date</label>
+        <input id="examDate" type="date">
+        <div class="range-head">
+          <label class="field-label" for="minutes" style="margin-bottom:5px">Study time each day</label>
+          <span class="range-value" id="minutesLabel">45 min</span>
+        </div>
+        <input id="minutes" type="range" min="20" max="120" step="5" value="45" aria-label="Study minutes per day">
+        <div class="range-hints"><span>20 min</span><span>2 hours</span></div>
+        <label class="field-label" for="daysPerWeek">Study days per week</label>
+        <select class="select-field" id="daysPerWeek">
+          <option value="3">3 days · steady pace</option>
+          <option value="4" selected>4 days · balanced</option>
+          <option value="5">5 days · focused</option>
+          <option value="6">6 days · intensive</option>
+          <option value="7">Every day</option>
+        </select>
+        <p class="field-label">Choose your focus areas</p>
+        <div class="domains">
+          <div class="domain"><input id="cloudFocus" type="checkbox" value="Cloud concepts" checked><label for="cloudFocus"><strong>Cloud concepts</strong><small>Cloud models, benefits &amp; responsibility</small></label><select class="confidence" aria-label="Cloud concepts confidence"><option value="1">New to me</option><option value="2">Needs work</option><option value="3" selected>Getting there</option><option value="4">Confident</option><option value="5">Strong</option></select></div>
+          <div class="domain"><input id="architectureFocus" type="checkbox" value="Azure architecture and services" checked><label for="architectureFocus"><strong>Architecture &amp; services</strong><small>Core services, regions &amp; infrastructure</small></label><select class="confidence" aria-label="Azure architecture and services confidence"><option value="1">New to me</option><option value="2" selected>Needs work</option><option value="3">Getting there</option><option value="4">Confident</option><option value="5">Strong</option></select></div>
+          <div class="domain"><input id="governanceFocus" type="checkbox" value="Azure management and governance"><label for="governanceFocus"><strong>Management &amp; governance</strong><small>Cost, compliance &amp; resource management</small></label><select class="confidence" aria-label="Management and governance confidence"><option value="1">New to me</option><option value="2" selected>Needs work</option><option value="3">Getting there</option><option value="4">Confident</option><option value="5">Strong</option></select></div>
+        </div>
+        <p class="form-message" id="formMessage" aria-live="polite"></p>
+        <button class="primary" id="generate">BUILD MY STUDY PLAN <span aria-hidden="true">→</span></button>
+        <p class="builder-foot">Self-rated focus areas shape the plan. Progress stays on this device.</p>
+      </section>
+      <div>
+        <section class="panel schedule" aria-labelledby="scheduleTitle">
+          <div class="schedule-head">
+            <div><h2 id="scheduleTitle">Your study plan</h2><p id="planMeta">A little progress, one day at a time.</p></div>
+            <div class="schedule-actions">
+              <button class="export-button" id="exportPlan" type="button" disabled>↓ Export CSV</button>
+              <div class="countdown" aria-live="polite"><strong id="daysLeft">--</strong><span>days left</span></div>
+            </div>
+          </div>
+          <div class="insights" aria-live="polite">
+            <div class="insight"><span>Self-rated readiness</span><strong id="readinessScore">3.0 / 5</strong><small id="readinessHint">Across all three domains</small></div>
+            <div class="insight"><span>Give extra time to</span><strong id="focusSuggestion">Azure services</strong><small>Lowest confidence rating</small></div>
+            <div class="insight"><span>Planned study time</span><strong id="totalStudy">--</strong><small id="sessionTotal">Build a plan to estimate</small></div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-copy"><strong>Plan progress</strong><span id="progressText">Build a plan to get started</span></div>
+            <div class="progress-track" role="progressbar" aria-label="Study plan progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="progressFill"></div></div>
+          </div>
+          <div class="session-list" id="sessionList">
+            <div class="empty-state"><span class="empty-icon" aria-hidden="true">✳</span><strong>Your next step starts here.</strong>Choose your date and focus areas, then build a plan that fits.</div>
+          </div>
+        </section>
+        <aside class="tip"><span aria-hidden="true">✦</span><div><strong>Keep it active.</strong>Try to explain each idea in your own words before moving on. Short recall sessions stick.</div></aside>
+        <p class="footer">Independent study aid. Not affiliated with or endorsed by Microsoft.</p>
+      </div>
+    </div>
+  </main>
+  <script>
+    const dateInput = document.querySelector('#examDate');
+    const minutesInput = document.querySelector('#minutes');
+    const daysInput = document.querySelector('#daysPerWeek');
+    const list = document.querySelector('#sessionList');
+    const storageKey = 'daymark-az900-plan-v1';
+    let activeSessions = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dateOffset = new Date(today);
+    dateOffset.setDate(today.getDate() + 14);
+    dateInput.min = formatDate(today);
+    dateInput.value = formatDate(dateOffset);
+
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function dateFromInput(value) {
+      const [year, month, day] = value.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function shortDate(date) {
+      return new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' }).format(date);
+    }
+
+    function selectedDomains() {
+      return [...document.querySelectorAll('.domain')]
+        .filter(domain => domain.querySelector('input').checked)
+        .map(domain => ({
+          name: domain.querySelector('input').value,
+          confidence: Number(domain.querySelector('.confidence').value)
+        }));
+    }
+
+    function createSessions(examDate, minutes, daysPerWeek, domains) {
+      const dayCount = Math.max(1, Math.ceil((examDate - today) / 86400000));
+      const count = Math.max(1, Math.min(30, Math.ceil(dayCount * daysPerWeek / 7)));
+      const sessions = [];
+      const chosen = domains.length ? domains : [{ name: 'AZ-900 review', confidence: 3 }];
+      const weightedTopics = chosen
+        .sort((first, second) => first.confidence - second.confidence)
+        .flatMap(domain => Array(Math.max(1, 6 - domain.confidence)).fill(domain));
+      for (let index = 0; index < count; index += 1) {
+        const date = new Date(today);
+        const dayOffset = count === 1 ? 0 : Math.round(index * (dayCount - 1) / (count - 1));
+        date.setDate(today.getDate() + dayOffset);
+        const isFinal = index === count - 1;
+        const isReview = index > 0 && (index + 1) % 4 === 0;
+        const topic = weightedTopics[index % weightedTopics.length];
+        const session = isFinal
+          ? { title: 'Confidence check & light review', detail: 'Review your notes, rest well, and trust your preparation.', topic: 'Final review' }
+          : isReview
+            ? { title: 'Recall review', detail: 'Revisit key terms and explain the topics you have studied.', topic: 'Spaced recall' }
+            : { title: `${topic.name}: ${index % 2 === 0 ? 'concept review' : 'scenario practice'}`, detail: index % 2 === 0 ? 'Review core ideas, then write a short explanation from memory.' : 'Work through original practice prompts and note anything unclear.', topic: `${topic.confidence}/5 confidence` };
+        sessions.push({ id: `${formatDate(date)}-${index}`, date: formatDate(date), ...session, minutes, done: false });
+      }
+      return sessions;
+    }
+
+    function savePlan(sessions) {
+      localStorage.setItem(storageKey, JSON.stringify({ examDate: dateInput.value, minutes: Number(minutesInput.value), daysPerWeek: Number(daysInput.value), domains: selectedDomains(), sessions }));
+    }
+
+    function updateInsights(sessions = activeSessions) {
+      const domains = [...document.querySelectorAll('.domain')].map(domain => ({
+        name: domain.querySelector('input').value,
+        label: domain.querySelector('label strong').textContent,
+        confidence: Number(domain.querySelector('.confidence').value)
+      }));
+      const average = domains.reduce((total, domain) => total + domain.confidence, 0) / domains.length;
+      const weakest = domains.reduce((lowest, domain) => domain.confidence < lowest.confidence ? domain : lowest);
+      document.querySelector('#readinessScore').textContent = `${average.toFixed(1)} / 5`;
+      document.querySelector('#readinessHint').textContent = average >= 4 ? 'Strong self-reported confidence' : average >= 3 ? 'Keep reinforcing key concepts' : 'Prioritize fundamentals and recall';
+      document.querySelector('#focusSuggestion').textContent = weakest.label;
+      const minutes = sessions.reduce((total, session) => total + session.minutes, 0);
+      document.querySelector('#totalStudy').textContent = sessions.length ? `${(minutes / 60).toFixed(1)} hrs` : '--';
+      document.querySelector('#sessionTotal').textContent = sessions.length ? `${sessions.length} planned sessions` : 'Build a plan to estimate';
+    }
+
+    function renderPlan(sessions) {
+      activeSessions = sessions;
+      list.replaceChildren();
+      const groups = new Map();
+      sessions.forEach(session => {
+        if (!groups.has(session.date)) groups.set(session.date, []);
+        groups.get(session.date).push(session);
+      });
+      for (const [dateKey, daySessions] of groups) {
+        const date = dateFromInput(dateKey);
+        const day = document.createElement('div');
+        day.className = `day${daySessions.every(session => session.done) ? ' is-done' : ''}`;
+        const dateTag = document.createElement('div');
+        dateTag.className = 'date-tag';
+        dateTag.innerHTML = `<strong>${shortDate(date).split(',')[0]}</strong>${shortDate(date).split(',').slice(1).join(',')}`;
+        const session = daySessions[0];
+        const content = document.createElement('div');
+        content.className = 'session';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'session-check';
+        checkbox.checked = session.done;
+        checkbox.setAttribute('aria-label', `Mark ${session.title} complete`);
+        checkbox.addEventListener('change', () => {
+          session.done = checkbox.checked;
+          savePlan(sessions);
+          renderPlan(sessions);
+        });
+        const copy = document.createElement('div');
+        copy.className = 'session-copy';
+        const title = document.createElement('strong');
+        title.textContent = session.title;
+        const detail = document.createElement('p');
+        detail.textContent = session.detail;
+        copy.append(title, detail);
+        if (session.topic) {
+          const topic = document.createElement('span');
+          topic.className = 'session-topic';
+          topic.textContent = session.topic;
+          copy.append(topic);
+        }
+        const duration = document.createElement('span');
+        duration.className = 'session-time';
+        duration.textContent = `${session.minutes} min`;
+        content.append(checkbox, copy, duration);
+        day.append(dateTag, content);
+        list.append(day);
+      }
+      const completed = sessions.filter(session => session.done).length;
+      const percent = sessions.length ? Math.round(completed / sessions.length * 100) : 0;
+      document.querySelector('#progressText').textContent = `${completed} of ${sessions.length} sessions complete`;
+      document.querySelector('#progressFill').style.width = `${percent}%`;
+      document.querySelector('.progress-track').setAttribute('aria-valuenow', String(percent));
+      document.querySelector('#exportPlan').disabled = sessions.length === 0;
+      updateInsights(sessions);
+    }
+
+    function updateSummary() {
+      const examDate = dateFromInput(dateInput.value);
+      const days = Math.max(0, Math.ceil((examDate - today) / 86400000));
+      document.querySelector('#daysLeft').textContent = days;
+      document.querySelector('#examSummary').innerHTML = `🗓️ <span>Exam date</span> <strong>${shortDate(examDate)}</strong>`;
+    }
+
+    function buildPlan() {
+      if (!dateInput.value) return;
+      document.querySelector('#formMessage').textContent = '';
+      const domains = selectedDomains();
+      if (!domains.length) {
+        document.querySelector('#formMessage').textContent = 'Select at least one focus area to build your plan.';
+        return;
+      }
+      const examDate = dateFromInput(dateInput.value);
+      if (examDate < today) {
+        dateInput.setCustomValidity('Choose today or a future date.');
+        dateInput.reportValidity();
+        return;
+      }
+      dateInput.setCustomValidity('');
+      const sessions = createSessions(examDate, Number(minutesInput.value), Number(daysInput.value), domains);
+      document.querySelector('#planMeta').textContent = `${sessions.length} sessions · ${daysInput.value} study days per week · ${minutesInput.value} min each`;
+      updateSummary();
+      savePlan(sessions);
+      renderPlan(sessions);
+    }
+
+    minutesInput.addEventListener('input', () => {
+      document.querySelector('#minutesLabel').textContent = `${minutesInput.value} min`;
+    });
+    document.querySelectorAll('.confidence').forEach(input => input.addEventListener('change', () => updateInsights()));
+    dateInput.addEventListener('change', updateSummary);
+    document.querySelector('#generate').addEventListener('click', buildPlan);
+    document.querySelector('#exportPlan').addEventListener('click', () => {
+      if (!activeSessions.length) return;
+      const rows = [['Date', 'Session', 'Focus', 'Minutes', 'Complete'], ...activeSessions.map(session => [session.date, session.title, session.topic || '', session.minutes, session.done ? 'Yes' : 'No'])];
+      const csv = rows.map(row => row.map(value => `"${String(value).replaceAll('"', '""')}"`).join(',')).join('\r\n');
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+      link.download = 'daymark-az900-study-plan.csv';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+    updateSummary();
+    updateInsights();
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        const plan = JSON.parse(saved);
+        if (plan.examDate && Array.isArray(plan.sessions)) {
+          dateInput.value = plan.examDate;
+          minutesInput.value = plan.minutes || 45;
+          daysInput.value = plan.daysPerWeek || 4;
+          document.querySelector('#minutesLabel').textContent = `${minutesInput.value} min`;
+          document.querySelectorAll('.domain').forEach(domain => {
+            const input = domain.querySelector('input');
+            const savedDomain = (plan.domains || []).find(item => (typeof item === 'string' ? item : item.name) === input.value);
+            input.checked = savedDomain ? true : typeof plan.domains[0] === 'string' ? plan.domains.includes(input.value) : false;
+            if (savedDomain && typeof savedDomain === 'object') domain.querySelector('.confidence').value = savedDomain.confidence;
+          });
+          document.querySelector('#planMeta').textContent = `${plan.sessions.length} sessions · ${daysInput.value} study days per week · ${minutesInput.value} min each`;
+          updateSummary();
+          renderPlan(plan.sessions);
+        }
+      } catch {
+        localStorage.removeItem(storageKey);
+      }
+    }
+    updateInsights();
+  </script>
+</body>
+</html>
