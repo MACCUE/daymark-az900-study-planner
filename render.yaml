@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: daymark-az900-study-planner
+    runtime: static
+    buildCommand: echo "No build step required"
+    staticPublishPath: .
